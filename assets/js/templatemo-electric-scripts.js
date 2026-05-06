@@ -70,6 +70,16 @@ setInterval(() => {
   wrapText(h1);
 }, 4000);
 
+function closeAlert() {
+  const sticky = document.getElementById('sticky-alert');
+  if (!sticky) return;
+
+  sticky.style.display = 'none';
+  localStorage.setItem('sticky-alert-dismissed', 'true');
+}
+
+window.closeAlert = closeAlert;
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // ===== NEWS =====
@@ -82,14 +92,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const sticky = document.getElementById("sticky-alert");
       const stickyText = document.getElementById("sticky-text");
 
-      if (!newsList || !sticky || !stickyText) return;
+      if (!newsList) return;
+
+      const stickyDismissed = localStorage.getItem('sticky-alert-dismissed') === 'true';
+
+      if (sticky && stickyText) {
+        if (stickyDismissed) {
+          sticky.style.display = 'none';
+        }
+      }
 
       const lastIndex = data.length - 1;
       const last = data[lastIndex];
 
       // sticky
-      stickyText.textContent = last.text;
-      sticky.style.display = "block";
+      if (sticky && stickyText && !stickyDismissed) {
+        stickyText.textContent = last.text;
+        sticky.style.display = "block";
+      }
 
       // news
       data.slice(0, lastIndex).reverse().forEach(item => {
